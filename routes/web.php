@@ -10,3 +10,4 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/karyawan', [KaryawanController::class, 'index'])->name('karyawan');
+Route::post('/simpan-karyawan', [KaryawanController::class,'simpan'])->name('simpan-karyawan');
