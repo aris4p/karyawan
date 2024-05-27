@@ -16,7 +16,7 @@
 </div>
 @endif
 <div class="mb-3">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCenter">
+    <button type="button" class="btn btn-primary" id="tambahkaryawan">
         Tambah Karyawan
     </button>
 </div>
@@ -107,9 +107,71 @@
     
     {{-- AKhir MOdal Tambah Karyawan --}}
     
+    {{-- Edit Karyawan --}}
+    
+    <div class="modal fade" id="editKaryawan" tabindex="-1" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCenterTitle">Edit Karyawan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col mb-3">
+                            <input type="hidden" id="karyawan_id">
+                            <label for="nameWithTitle" class="form-label">Nama Karyawan</label>
+                            <input type="text" id="editnameWithTitle" class="form-control" placeholder="Masukan Nama">
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col mb-0">
+                            <label for="editemailWithTitle" class="form-label">Email</label>
+                            <input type="text" id="editemailWithTitle" class="form-control" placeholder="xxxx@xxx.xx">
+                        </div>
+                        <div class="col mb-0">
+                            <label for="editdobWithTitle" class="form-label">Tanggal Lahir</label>
+                            <input type="date" id="editdobWithTitle" class="form-control" placeholder="DD / MM / YY">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="editalamatWithTitle" class="form-label">Alamat</label>
+                            <textarea type="text" id="editalamatWithTitle" class="form-control" placeholder="Alamat"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="editfoto" class="form-label">File Foto</label>
+                            <input type="file" id="editfoto" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select id="editstatus" class="form-select">
+                                <option value="1">Menikah</option>
+                                <option value="0">Belum Menikah</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" id="btnSimpanEditKaryawan" class="btn btn-primary">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{-- AKhir Edit Karyawan --}}
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <script type="text/javascript">
         $(document).ready(function() {
+            
             $('#data-table').DataTable({
                 "processing": true,
                 "serverSide": true,
@@ -126,7 +188,12 @@
                 ]
             });
             
+            $('#tambahkaryawan').click(function(){
+                $('#modalCenter').modal('show');
+            });
+
             $('#btnSimpanKaryawan').click(function(){
+             
                 var nama = $('#nameWithTitle').val();
                 var email = $('#emailWithTitle').val();
                 var dob = $('#dobWithTitle').val();
@@ -154,13 +221,13 @@
                     success: function(response){
                         
                         $('#data-table').DataTable().ajax.reload(); // Perbarui datatable dengan AJAX
-                        $('#modalCenter').modal('hide'); // Menutup modal secara otomatis
                         Toastify({
                             text: "Data berhasil disimpan",
                             duration: 3000, // Durasi tampilan pesan (dalam milidetik)
                             gravity: "bottom", // Posisi pesan (top, bottom, center)
                             backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)" // Warna latar belakang pesan
                         }).showToast();
+                        $('#modalCenter').modal('hide'); // Menutup modal secara otomatis
                     },
                     error: function(xhr){
                         Toastify({
@@ -172,6 +239,86 @@
                     }
                 });
             });
+
+            let karyawan_id;
+            
+            $('body').on('click', '#editbtn', function () {
+                
+                let karyawan_id = $(this).data('id');
+                console.log(karyawan_id);
+                //fetch detail post with ajax
+                $.ajax({
+                    url: `/getkaryawan/`+ karyawan_id,
+                    type: "GET",
+                    cache: false,
+                    success:function(response){
+                        
+                        //fill data to form
+                        $('#karyawan_id').val(response.data.id);
+                        $('#editnameWithTitle').val(response.data.name);
+                        $('#editemailWithTitle').val(response.data.email);
+                        $('#editdobWithTitle').val(response.data.tgllahir);
+                        $('#editalamatWithTitle').val(response.data.alamat);
+                        $('#editstatus').val(response.data.status);
+                        
+                        //open modal
+                        $('#editKaryawan').modal('show');
+                    }
+                });
+            });
+
+            $('body').on('click', '#btnSimpanEditKaryawan', function () {
+                let karyawan_id = $('#karyawan_id').val();
+                let name = $('#editnameWithTitle').val();
+                let email = $('#editemailWithTitle').val();
+                let dob = $('#editdobWithTitle').val();
+                let alamat = $('#editalamatWithTitle').val();
+                let foto = $('#editfoto')[0].files[0];
+                let status = $('#editstatus').val();
+                let csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                let formData = new FormData(); // Buat objek FormData untuk mengirim data termasuk file
+                formData.append('_token', csrfToken);
+                formData.append('id', karyawan_id);
+                formData.append('name', name);
+                formData.append('email', email);
+                formData.append('tgllahir', dob);
+                formData.append('alamat', alamat);
+                formData.append('status', status);
+                formData.append('foto', foto);
+
+                
+                // Mengirim data pembaruan dengan AJAX
+                $.ajax({
+                    url: '/updatekaryawan/' + karyawan_id,
+                    type: 'POST',
+                    data: formData,
+                    processData: false, 
+                    contentType: false,  
+                    success: function (response) {
+                        // Memperbarui tampilan atau melakukan tindakan setelah pembaruan berhasil
+                        if (response.success) {
+                            $('#data-table').DataTable().ajax.reload(); // Perbarui datatable dengan AJAX
+                        Toastify({
+                            text: "Data berhasil disimpan",
+                            duration: 3000, // Durasi tampilan pesan (dalam milidetik)
+                            gravity: "bottom", // Posisi pesan (top, bottom, center)
+                            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)" // Warna latar belakang pesan
+                        }).showToast();
+                            $('#editKaryawan').modal('hide');
+                            // Atau melakukan tindakan lain yang diperlukan
+                        } else {
+                            // Menampilkan pesan kesalahan jika diperlukan
+                            alert('Gagal memperbarui karyawan. Silakan coba lagi.');
+                        }
+                    },
+                    error: function () {
+                        // Menampilkan pesan kesalahan jika terjadi kesalahan dalam permintaan AJAX
+                        alert('Terjadi kesalahan dalam memperbarui karyawan. Silakan coba lagi.');
+                    }
+                });
+            });
+            
             
             
         });
