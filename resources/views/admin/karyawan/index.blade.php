@@ -171,13 +171,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            
+            //Datatables
             $('#data-table').DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": "{{ route('karyawan') }}",
                 "columns": [
-                { "data": "id" },
+                { "data": 'DT_RowIndex', "searchable": false, "orderable": false},
                 { "data": "name" },
                 { "data": "tgllahir" },
                 { "data": "alamat" },
@@ -188,12 +188,14 @@
                 ]
             });
             
+            //tombol tambah karyawan
             $('#tambahkaryawan').click(function(){
                 $('#modalCenter').modal('show');
             });
-
+            
+            //simpan data karyawan
             $('#btnSimpanKaryawan').click(function(){
-             
+                
                 var nama = $('#nameWithTitle').val();
                 var email = $('#emailWithTitle').val();
                 var dob = $('#dobWithTitle').val();
@@ -239,9 +241,8 @@
                     }
                 });
             });
-
-            let karyawan_id;
             
+            //getkaryawan untuk edit
             $('body').on('click', '#editbtn', function () {
                 
                 let karyawan_id = $(this).data('id');
@@ -266,7 +267,8 @@
                     }
                 });
             });
-
+            
+            //edit karyawan
             $('body').on('click', '#btnSimpanEditKaryawan', function () {
                 let karyawan_id = $('#karyawan_id').val();
                 let name = $('#editnameWithTitle').val();
@@ -276,7 +278,7 @@
                 let foto = $('#editfoto')[0].files[0];
                 let status = $('#editstatus').val();
                 let csrfToken = $('meta[name="csrf-token"]').attr('content');
-
+                
                 let formData = new FormData(); // Buat objek FormData untuk mengirim data termasuk file
                 formData.append('_token', csrfToken);
                 formData.append('id', karyawan_id);
@@ -286,7 +288,7 @@
                 formData.append('alamat', alamat);
                 formData.append('status', status);
                 formData.append('foto', foto);
-
+                
                 
                 // Mengirim data pembaruan dengan AJAX
                 $.ajax({
@@ -299,12 +301,12 @@
                         // Memperbarui tampilan atau melakukan tindakan setelah pembaruan berhasil
                         if (response.success) {
                             $('#data-table').DataTable().ajax.reload(); // Perbarui datatable dengan AJAX
-                        Toastify({
-                            text: "Data berhasil disimpan",
-                            duration: 3000, // Durasi tampilan pesan (dalam milidetik)
-                            gravity: "bottom", // Posisi pesan (top, bottom, center)
-                            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)" // Warna latar belakang pesan
-                        }).showToast();
+                            Toastify({
+                                text: "Data berhasil disimpan",
+                                duration: 3000, // Durasi tampilan pesan (dalam milidetik)
+                                gravity: "bottom", // Posisi pesan (top, bottom, center)
+                                backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)" // Warna latar belakang pesan
+                            }).showToast();
                             $('#editKaryawan').modal('hide');
                             // Atau melakukan tindakan lain yang diperlukan
                         } else {
@@ -319,7 +321,45 @@
                 });
             });
             
+            //Hapus Data Karyawan
+            function deleteKaryawan(karyawan_id) {
+                let csrfToken = $('meta[name="csrf-token"]').attr('content');
+                
+                // Mengirim permintaan AJAX untuk menghapus data karyawan
+                $.ajax({
+                    url: '/deletekaryawan/' + karyawan_id,
+                    type: 'DELETE',
+                    data: {
+                        _token: csrfToken,
+                        id: karyawan_id
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // Tindakan jika penghapusan berhasil
+                            $('#data-table').DataTable().ajax.reload(); // Perbarui datatable dengan AJAX
+                            Toastify({
+                                text: "Data karyawan berhasil dihapus",
+                                duration: 3000,
+                                gravity: "bottom",
+                                backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)"
+                            }).showToast();
+                        } else {
+                            // Tindakan jika terjadi kesalahan saat menghapus
+                            alert('Gagal menghapus data karyawan. Silakan coba lagi.');
+                        }
+                    },
+                    error: function () {
+                        // Tindakan jika terjadi kesalahan dalam permintaan AJAX
+                        alert('Terjadi kesalahan dalam menghapus data karyawan. Silakan coba lagi.');
+                    }
+                });
+            }
             
+            // Memanggil fungsi deleteKaryawan() saat pengguna mengklik tombol hapus
+            $('body').on('click', '#btnHapusKaryawan', function () {
+                let karyawan_id = $(this).data('id');
+                deleteKaryawan(karyawan_id); // Panggil fungsi deleteKaryawan() dengan ID karyawan yang ingin dihapus
+            });
             
         });
         

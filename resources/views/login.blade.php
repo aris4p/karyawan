@@ -76,7 +76,7 @@
                     <p class="text-center small">Masukan email dan password</p>
                   </div>
 
-                  <form action="/login" method="post" class="row g-3 needs-validation" >
+                  <form action="{{ route('proses-login') }}" method="post" class="row g-3 needs-validation" >
                     @csrf
                     <div class="col-12">
                       <label for="email" class="form-label">Email</label>

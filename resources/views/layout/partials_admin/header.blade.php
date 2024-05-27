@@ -30,7 +30,7 @@
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
             @auth
                 @if (Auth()->user()->foto)
-                    <img src="{{ asset('admin/img/'.auth()->user()->foto) }}" alt="Profile" class="rounded-circle">
+                    <img src="{{ asset('images/'.auth()->user()->foto) }}" alt="Profile" class="rounded-circle">
                 @else
                     <img src="{{ asset('admin/img/akun.webp')}}" alt="Profile" class="rounded-circle">
                 @endif
@@ -43,13 +43,7 @@
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
                 @auth
-              <h6>{{ auth()->user()->name }} |
-
-               @if ( auth()->user()->role  == 1 )
-                    Admin
-               @else
-                    Member
-               @endif
+              <h6>{{ auth()->user()->name }}
             </h6>
               @else
               <h6>Tamu</h6>
@@ -58,7 +52,6 @@
             <li>
               <hr class="dropdown-divider">
             </li>
-
             <li>
               <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
                 <i class="bi bi-person"></i>

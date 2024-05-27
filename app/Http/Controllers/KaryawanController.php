@@ -17,7 +17,7 @@ class KaryawanController extends Controller
             ->addIndexColumn()
             ->addColumn('action', function($row){
                 $editBtn = '<a href="javascript:void(0)" class="editBtn btn btn-primary btn-sm" id="editbtn" data-id="'.$row->id.'">Edit</a>';
-                $deleteBtn = '<a href="javascript:void(0)" class="deleteBtn btn btn-danger btn-sm" data-id="'.$row->id.'">Delete</a>';
+                $deleteBtn = '<a href="javascript:void(0)" class="deleteBtn btn btn-danger btn-sm" id="btnHapusKaryawan" data-id="'.$row->id.'">Delete</a>';
                 return $editBtn . ' ' . $deleteBtn;
             })
             
@@ -145,6 +145,22 @@ class KaryawanController extends Controller
         ]);
         
         
+    }
+
+    public function delete(Request $request, $id) {
+        // Temukan karyawan berdasarkan ID
+        $karyawan = User::find($id);
+
+        if ($karyawan) {
+            // Hapus karyawan jika ditemukan
+            $karyawan->delete();
+            
+            // Memberikan respons JSON yang menandakan penghapusan berhasil
+            return response()->json(['success' => true]);
+        } else {
+            // Memberikan respons JSON yang menandakan karyawan tidak ditemukan
+            return response()->json(['success' => false]);
+        }
     }
     
     
