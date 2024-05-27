@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
 
 class KaryawanController extends Controller
@@ -161,6 +163,45 @@ class KaryawanController extends Controller
             // Memberikan respons JSON yang menandakan karyawan tidak ditemukan
             return response()->json(['success' => false]);
         }
+    }
+
+
+    public function gantipassword(){
+        return view('admin.karyawan.gantipassword',[
+            'title' => "Akun"
+        ]);
+    }
+
+    public function prosesgantiPassword(Request $request)
+    {
+
+        $request->validate([
+            'passwordSaatIni' => 'required',
+            'passwordBaru' => 'required|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+
+       #Match The Old Password
+     $cek = Hash::check($request->passwordSaatIni, $user->password);
+     $cek2 = Hash::check($request->passwordBaru, $user->password);
+     if(!$cek){
+        return back()->with('error', 'Password Lama Tidak sesuai');
+     }
+     if($cek2){
+        return back()->with('error', 'Password Tidak Boleh Sama seperti sebelumnya');
+     }
+
+    
+
+
+    #Update the new Password
+    User::whereId(auth()->user()->id)->update([
+        'password' => Hash::make($request->passwordBaru)
+    ]);
+
+    return redirect()->back()->with('success', 'Password berhasil diubah');
+
     }
     
     

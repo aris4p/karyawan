@@ -12,7 +12,6 @@
     {{-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> --}}
     
     <!-- Favicons -->
-    <link href="{{ asset('admin/img/logo-wetoko.png')}}" rel="icon">
     <link href="{{ asset('admin/img/apple-touch-icon.png')}}" rel="apple-touch-icon">
     
     <!-- Google Fonts -->
@@ -73,8 +72,6 @@
     
     <!-- Template Main JS File -->
     <script src="{{ asset ('admin/js/main.js')}}"></script>
-    
-    
     
     
 </body>

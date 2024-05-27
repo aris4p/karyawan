@@ -105,6 +105,12 @@
           </div>
         </div>
 
+        <p class="text-center">
+          <span>Belum punya akun?</span>
+          <a href="{{ route('register') }}">
+            <span>Daftar disini</span>
+          </a>
+        </p>
       </section>
 
     </div>
